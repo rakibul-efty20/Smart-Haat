@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 400" role="img" aria-labelledby="title">
+  <title id="title">Fresh groceries in a basket</title>
+  <ellipse cx="268" cy="350" rx="180" ry="24" fill="#86c99b" opacity=".35"/>
+  <path d="M115 196h301l-24 133a25 25 0 0 1-25 21H168a25 25 0 0 1-25-21l-28-133Z" fill="#b45309"/>
+  <path d="m148 219 18 108h193l20-108" fill="#d97706"/>
+  <path d="M164 213c-16-48 13-80 47-71 15-51 84-57 105-8 39-20 77 15 66 58 34 7 39 29 26 46H151c-8-11-3-21 13-25Z" fill="#16a34a"/>
+  <path d="M204 153c9-24 30-34 48-31m30 3c14-13 38-12 52 2m-120 67c16-9 28-7 38 2m60-25c12-13 28-15 44-7" fill="none" stroke="#86c99b" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="188" cy="183" r="34" fill="#ef4444"/><path d="M187 151c4-12 13-17 24-17-1 12-9 20-24 20" fill="#15803d"/>
+  <circle cx="340" cy="181" r="36" fill="#f59e0b"/><path d="M335 144c8-15 20-20 34-18-4 15-15 23-32 23" fill="#15803d"/>
+  <path d="M251 149c-1-35 21-53 52-51 5 30-12 52-48 60" fill="#15803d"/><path d="M252 155c12-17 27-31 44-42" fill="none" stroke="#dcfce7" stroke-width="4" stroke-linecap="round"/>
+  <path d="M190 234v72m42-77v80m43-81v82m44-82v82m44-81v79" stroke="#92400e" stroke-width="9" opacity=".55"/>
+  <path d="M162 209c-2-55 36-87 76-86 25-56 108-69 144-21" fill="none" stroke="#92400e" stroke-width="18" stroke-linecap="round"/>
+  <path d="M424 111c16-29 42-31 58-18-9 25-31 34-59 25m-13-2c-5-32 12-52 37-54 9 25-3 44-33 55" fill="#16a34a"/><path d="m405 120 34-37" stroke="#15803d" stroke-width="4"/>
+  <circle cx="127" cy="117" r="8" fill="#f59e0b"/><circle cx="91" cy="163" r="5" fill="#16a34a"/><circle cx="436" cy="246" r="7" fill="#16a34a"/><circle cx="462" cy="207" r="5" fill="#f59e0b"/>
+</svg>

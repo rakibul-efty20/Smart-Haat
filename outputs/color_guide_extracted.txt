@@ -1,0 +1,113 @@
+PAGES 5
+---PAGE 1---\nSmartHaat Colour Guide
+Fresh green theme: where each colour goes, for the storefront and the admin panel
+1. The idea
+SmartHaat is a supershop-style store, in the spirit of Meena Bazar: clean white surfaces,
+product photos and prices first, and one strong brand colour. Green signals freshness and
+trust, so it is used for actions and brand moments. Amber is reserved for offers so
+discounts catch the eye. A near-black navy anchors the top bar and footer.
+Rule of thumb: about 60% white and light neutrals, 30% green, 10% amber and dark
+accents.
+SmartHaat Colour Guide
+Page 1 of 5\n---PAGE 2---\n2. The palette
+3. Where each colour goes
+Navbar
+Background white with a #e5e7eb bottom border
+Logo as an image; links in text colour #1f2937; active link in primary dark
+Search button: green filled
+Cart badge: primary green
+Login: green outline. Register: green filled
+Top bar
+Background #111827 with white text (delivery and member-discount message)
+Role Colour CSS variable Main use
+Primary #16a34a --primary Brand colour, badges, links, active states
+Primary dark #15803d --primary-dark Button backgrounds, prices, headings on
+light green
+Accent #f59e0b --accent Discount tags and offers only
+Soft tint #dcfce7 --soft Hero banner, image backgrounds, light
+highlights
+Footer #111827 --footer Footer, top bar, admin sidebar
+Text #1f2937 --bs-body-color Body text
+Muted #6b7280 --bs-secondary-
+rgb
+Secondary text, old prices
+Page
+background
+#f9fafb --bs-body-bg Behind everything
+Border #e5e7eb --bs-border-
+color
+Lines and card edges
+White #ffffff Navbar, cards, forms
+SmartHaat Colour Guide
+Page 2 of 5\n---PAGE 3---\nHome hero and banners
+Soft tint #dcfce7 background, heading in primary dark, body text #1f2937
+Coupon box: dashed border and text in primary dark
+Category chips and menus
+Inactive chip: white with a #e5e7eb border and normal text
+Active chip: primary green background with white text
+Dropdown link hover: primary green text
+Product cards
+White card with a #e5e7eb border; image area in soft tint
+Product name: #1f2937
+Current price: primary dark. Old price: muted and struck through
+Discount tag: amber background with dark text (#1f2937)
+Add to cart: green filled button
+Buttons
+Main actions (Add to cart, Checkout, Place order, Save): green filled
+Secondary actions (Login, View details, Cancel): green outline
+Offer actions (Apply coupon, Flash sale): amber with dark text
+Disabled: muted grey
+Prices, discounts and coupons
+Final price: primary dark. Original price: muted, struck through
+Member discount line: primary green. Coupon discount line: amber
+Only offers use amber, so it keeps standing out
+Forms and messages
+Borders #e5e7eb; focus ring in primary green
+Success: green. Warning: amber. Error: red #dc2626 (a system colour, not a brand
+colour)
+SmartHaat Colour Guide
+Page 3 of 5\n---PAGE 4---\nFooter
+Background #111827; headings white; links soft white, turning white on hover
+Use a light version of the logo on this dark background
+Bottom copyright bar separated by a grey line
+Admin panel
+Sidebar: #111827 with the active item in primary green
+Page background #f9fafb; cards white with a #e5e7eb border
+Dashboard cards: green for sales and growth, amber for pending and low stock, red for
+out of stock and cancelled
+Suggested chart colours, in order: #16a34a, #f59e0b, #0ea5e9, #8b5cf6, #ef4444
+Order and stock status colours
+4. Readability rules
+Approximate contrast ratios (4.5:1 is the target for normal text):
+Status Colour
+Pending Amber #f59e0b
+Confirmed Blue #0ea5e9
+Packed Purple #8b5cf6
+Delivered Green #16a34a
+Cancelled Red #dc2626
+Low stock / expiring soon Amber #f59e0b
+Out of stock / expired Red #dc2626
+Combination Ratio Verdict
+White on primary dark #15803d 5.0:1 Good for buttons and text
+White on primary #16a34a 3.3:1 Large text and badges only
+SmartHaat Colour Guide
+Page 4 of 5\n---PAGE 5---\n5. Do and don't
+Do use green for actions and amber only for offers.
+Do keep cards white on the light grey page background.
+Do use primary dark for button backgrounds and prices.
+Don't use amber for ordinary buttons or headings, and never put white text on amber.
+Don't add another brand colour. The status colours above are the only exception.
+Don't use pure black. Body text is #1f2937.
+6. Where to change the colours in code
+All brand colours live in one place: the :root block at the top of src/styles.scss.
+Changing a value there updates the navbar, footer, buttons and cards together.
+Ready-made classes: btn-primary, btn-outline-primary, btn-accent, bg-soft, bg-
+footer, bg-accent, text-accent and footer-link.
+Combination Ratio Verdict
+Dark text #1f2937 on amber #f59e0b 6.8:1 Good
+White on amber #f59e0b 2.1:1 Do not use
+Primary dark on soft tint #dcfce7 4.6:1 Good
+Muted #6b7280 on white 4.8:1 Good
+White on footer #111827 17.7:1 Excellent
+SmartHaat Colour Guide
+Page 5 of 5

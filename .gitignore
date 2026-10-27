@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.dotnet-home/
+work/
+restore.log
+build.log
+build-full.log
+src/SmartHaat.Api/wwwroot/media/products/*
+!src/SmartHaat.Api/wwwroot/media/products/.gitkeep
+.vs/

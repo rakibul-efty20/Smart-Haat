@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SmartHaat.Api/SmartHaat.Api.csproj" />
+    <Project Path="src/SmartHaat.Application/SmartHaat.Application.csproj" />
+    <Project Path="src/SmartHaat.Domain/SmartHaat.Domain.csproj" />
+    <Project Path="src/SmartHaat.Infrastructure/SmartHaat.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SmartHaat.UnitTests/SmartHaat.UnitTests.csproj" />
+  </Folder>
+</Solution>

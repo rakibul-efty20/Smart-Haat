@@ -1,0 +1,410 @@
+SMART-HAAT
+Grocery E-Commerce & Store Management System
+Backend: ASP.NET Core Web API on .NET 10  |  Frontend: Angular 22 (zoneless)  |  Database: Microsoft SQL Server
+Project Blueprint, Feature Specification & Phased RoadmapA student-friendly, job-oriented plan for a grocery storefront, inventory, expiry tracking, staff POS and administration.
+Planning document only. It describes features, architecture, data concepts, APIs, security, testing and delivery phases. It intentionally contains no implementation code.
+— End of confirmed revision. The original blueprint follows.
+The original blueprint's broader scope remains in effect unless explicitly narrowed above: public grocery storefront, customer accounts, guest checkout/tracking, cart and checkout, product/category management, inventory batch and expiry tracking, coupons/discounts, POS, order management, low-stock/near-expiry alerts, reporting, notifications, testing, deployment, and documentation. Real payment-provider integration, production hosting, and external notification services remain later decisions rather than requirements for the first runnable version.
+## 6. Scope notes
+A Phase 0–1 starter scaffold has been prepared as SmartHaat.Backend. It contains the initial Domain, Application, Infrastructure, API, and unit-test projects plus category/product endpoints. It has not yet been compiled in the assistant's execution environment because the .NET SDK is unavailable there; the EF Core migration has not been generated, and Identity/JWT workflows and Admin bootstrap remain for the next phase. Treat the scaffold as an initial deliverable pending a successful local build and test run in Visual Studio.
+## 5. Current implementation status at this revision
+Later phases — inventory batches and expiry, stock movements and reservations, carts/pricing/discounts, online orders and COD, POS cash sales, delivery zones/fees, salesman assignment/visibility, alerts, reports, Angular storefront/admin integration, and end-to-end testing.
+Phase 3 — catalog completion: image upload/storage abstraction, category/product seed data, robust catalog filtering, and integration tests.
+Phase 2 — database and identity: verify the build, configure LocalDB, generate/apply EF Core migrations, seed essential roles/data, implement Identity registration/login and JWT issuance, and add the development-only Admin bootstrap.
+Phase 1 — catalog foundation: Category and Product entities, DTOs, mapping, validation, services, public read endpoints, Admin-protected write endpoints, pagination/search, and unit tests.
+Phase 0 — solution foundation: separate solution, project structure, shared build configuration, configuration/secrets approach, API startup, health checks, and architecture notes.
+## 4. Phased delivery plan
+Build in phases that are independently buildable, testable, and runnable. Add unit and integration tests for business rules and API behavior before expanding the next phase.
+Keep historical order-line price/product snapshots stable when catalog data changes.
+Use database constraints and indexes for key uniqueness rules (such as SKU and slug), transactions for multi-step workflows, and concurrency handling for stock/order operations.
+Use DTOs instead of exposing EF Core entities directly; use dependency injection, environment-based configuration, secure secret storage, consistent Problem Details/error responses, structured logging, health checks, and documented Swagger/OpenAPI endpoints.
+Use a modular monolith, not microservices, for the initial product. Keep Catalog, Identity, Pricing, Cart, Orders, Inventory, Payments, Delivery, POS, Alerts, and Reporting as clear modules within the solution.
+## 3. Confirmed architecture and quality requirements
+Admin bootstrap: provide a secure development-only way to create the first Admin account. Never ship a default production password or enable development bootstrap in production.
+Initial tax scope: no tax calculation in the first version. Keep this explicit in price/order calculations and documentation rather than silently adding tax.
+Images: use local file storage for development behind an image-storage abstraction. Validate uploaded content and size, generate safe random file names, and store a storage key/URL in the database. A different provider can be introduced later.
+Delivery: support configurable delivery zones/areas and delivery fees stored in the database; do not require a paid maps API for the initial implementation.
+Product variants: keep the architecture extensible for variants, but implement them only when a real product requirement needs them; they are not mandatory for the first catalog phase.
+Order visibility: Salesman/staff users can access only their own or assigned orders. Admin users can access all orders. Enforce these restrictions in backend queries and authorization rules.
+Inventory and expiry: track stock in inventory batches, not as a single expiry date on the product. Use appropriate batch allocation (including FEFO where suitable), stock movements, concurrency protection, and configurable low-stock/near-expiry thresholds.
+Stock reservation: reserve stock when an order is created. Reservations must have an expiry/release policy so abandoned, expired, or cancelled orders do not hold stock indefinitely.
+Discount policy: do not stack eligible discounts. Calculate the eligible alternatives and apply only the better discount, with the rule covered by automated tests.
+Initial payment methods: Cash on Delivery (COD) for online orders and cash for staff POS orders. Do not handle or store raw card details. Additional payment providers can be added behind an abstraction later.
+Currency: Bangladeshi taka (BDT). Use decimal monetary values and explicit database precision; do not add tax calculation in the initial version.
+## 2. Confirmed business rules
+Authentication: ASP.NET Core Identity with JWT bearer authentication. Authorization must be enforced by the API, not merely by frontend route guards or hidden controls.
+Validation: FluentValidation.
+Mapping: AutoMapper.
+Architecture: Modern Clean Architecture, implemented as a modular monolith with clear Domain, Application, Infrastructure, and API boundaries.
+Solution boundary: build Smart-Haat as a completely separate solution, not inside or as a modification of the reference/sample project. The sample project is a style/reference only.
+IDE: Visual Studio. The .NET 10 SDK is installed.
+Database: Microsoft SQL Server with SQL Server LocalDB for development; Entity Framework Core migrations.
+Frontend: Angular 22 using standalone components and zoneless change detection, as specified in the original blueprint.
+Backend: ASP.NET Core Web API on .NET 10, C#.
+## 1. Confirmed technology and development environment
+This revision incorporates the decisions confirmed after the original blueprint was prepared. The original blueprint remains below, preserving its feature specification, architecture guidance, and roadmap. Where an earlier recommendation conflicts with this revision, the confirmed decisions in this section take precedence.
+Updated: 16 October 2026 | Project: Smart-Haat
+## REVISION 1 — CONFIRMED PROJECT DECISIONS
+## 1. Executive Summary
+Build Smart-Haat, a portfolio-quality grocery e-commerce management system for a small grocery/food retailer. It supports a public storefront, customer accounts, guest checkout, shopping carts, coupons, inventory, food expiry tracking, staff-assisted point-of-sale (POS) orders, admin management, and sales reporting.
+The project should demonstrate the complete lifecycle of a modern web application: requirements, modular backend design, database modeling, REST API design, frontend integration, authentication and authorization, validation, testing, logging, deployment, and documentation. The target is not to imitate a huge enterprise platform with dozens of services; it is to deliver a reliable modular monolith with clear boundaries and demonstrable engineering decisions.
+## Primary goals
+Use ASP.NET Core Web API on .NET 10, Angular 22 in zoneless mode, and Microsoft SQL Server.
+Apply the relevant skills from Trevoir Williams' ASP.NET Core Web API course: REST, EF Core, DI, DTOs, service/repository boundaries, Identity/JWT, Swagger/OpenAPI, logging, middleware, validation and deployment.
+Support both online customer orders and staff-created in-store/POS orders.
+Track stock movements and food batches/expiry dates, with configurable low-stock and near-expiry alerts.
+Use free or open-source tools and free-tier/local development options; avoid mandatory paid APIs.
+Build in small, complete, testable phases suitable for a student schedule and job interviews.
+## 2. Technology Decisions
+[TABLE]
+Layer | Selected technology / approach | Notes
+Backend | ASP.NET Core Web API — .NET 10; C# | Use the current .NET 10 LTS release and keep packages compatible with the chosen target framework.
+Frontend | Angular 22, standalone components, zoneless change detection | Use signals and services for state first; add a state-management library only if complexity warrants it.
+Database | Microsoft SQL Server + EF Core | Use migrations, explicit constraints, indexes, transactions and concurrency handling.
+Identity | ASP.NET Core Identity + JWT access tokens and refresh-token strategy | Use role/policy authorization. For browser security, evaluate secure HttpOnly cookies/BFF patterns rather than automatically storing long-lived tokens in localStorage.
+API docs | Swagger/OpenAPI tooling compatible with .NET 10 | Document endpoints, validation errors, authentication and example payloads.
+Validation | FluentValidation or built-in validation | Choose one consistent approach; avoid duplicating the same rules in many layers.
+Mapping | Manual mapping or Mapster/AutoMapper | Mapping libraries are optional; use one only when it improves maintainability.
+Logging | Microsoft ILogger with Serilog as an optional structured logging provider | Never log passwords, access tokens, full payment credentials or unnecessary personal data.
+Testing | xUnit, ASP.NET Core integration tests, and Playwright for browser flows | Keep unit tests fast; test SQL behavior and transaction rules with a realistic test database where possible.
+Source control | Git + GitHub | Use meaningful commits, issue tracking, a useful README, and a small CI workflow.
+Local environment | Docker Compose where useful; SQL Server Developer/Express or a suitable local SQL Server setup | Confirm licensing and machine compatibility; Docker is optional, not a requirement for every student machine.
+Deployment | IIS or a suitable free/low-cost hosting option; SQL Server hosting decision documented separately | A free application host does not imply free managed SQL hosting. Verify current quotas, sleep policies, database costs and terms before choosing.
+Version note: Angular 22 and .NET 10 are the requested targets. Before starting, confirm their current stable releases, supported package versions and migration guidance from the official documentation. Do not mix examples from older .NET or Angular versions without checking compatibility.
+## 3. Scope and User Types
+## User roles
+[TABLE]
+Role | Main capabilities | Restrictions
+Guest | Browse public catalog, search/filter, maintain a guest cart, place an eligible guest order, track an order using a secure reference. | Cannot access account history or staff/admin functions.
+Customer | All public features, profile and addresses, cart merge after login, member discount if configured, order history, order details, cancellation request where allowed. | Can access only their own personal data and orders.
+Salesman / Staff | Create in-store POS orders, view permitted product/stock information, apply authorized discounts, view and update assigned/own sales according to policy. | Cannot manage users, roles, global coupons or product prices unless explicitly granted permission.
+Admin | Manage products, categories, stock, batches, expiry rules, coupons, orders, users/staff, reports and system configuration. | Privileged actions should be audited and protected with strong authentication.
+Authorization must be enforced by the API, not only Angular route guards. The frontend guards improve navigation and user experience, but every protected backend endpoint must independently verify permissions.
+## Separate staff login
+A dedicated staff/admin login screen and route such as /admin/login is reasonable for user experience. It may use a distinct API route such as /api/admin/auth/login, but this is not a security boundary by itself. The server must reject accounts without an authorized staff/admin role or policy, and must not reveal whether a username exists. Consider MFA for privileged users if feasible.
+## 4. High-Level Architecture
+Angular SPA communicates with the ASP.NET Core API over HTTPS. The API handles authentication, authorization, validation, business rules and persistence. SQL Server stores transactional data. Product images and generated documents belong in a storage abstraction; local file storage can be used in development, with a compatible object-storage provider selected later.
+[TABLE]
+Component | Responsibility
+Angular storefront | Home, categories, search, product pages, cart, checkout, account and order tracking.
+Angular admin/staff portal | Dashboard, product/category/coupon management, stock and batch management, orders, POS, reports and user management.
+ASP.NET Core API | REST endpoints, request validation, authentication/authorization, business workflows, error handling and API contracts.
+Application layer | Use cases, price calculation, order workflow, stock reservation/deduction, coupon validation and alert generation.
+Domain layer | Business entities, value rules, status transitions and invariants; independent of infrastructure.
+Infrastructure layer | EF Core/SQL Server, identity persistence, file storage, email abstraction, logging and external integrations.
+Background processing | Scheduled expiry/low-stock checks, email queue processing and cleanup. Start with a hosted background service or a free/open-source job tool; introduce a broker only when justified.
+Observability | Structured logs, health checks, metrics/tracing where feasible, actionable error responses and deployment diagnostics.
+## Suggested solution structure
+Shop.Domain — entities, enums, value objects and domain rules.
+Shop.Application — use cases/services, DTOs, interfaces, validators and mapping.
+Shop.Infrastructure — DbContext, migrations, repositories where valuable, Identity persistence, storage and email implementations.
+Shop.Api — controllers/endpoints, middleware, authentication setup, configuration and application startup.
+Shop.UnitTests, Shop.IntegrationTests, and optionally Shop.ArchitectureTests.
+Use a modular monolith first. Keep Products, Catalog, Cart, Pricing, Orders, Inventory, Payments, Identity and Reporting as clear modules within the same deployable application. Microservices, Kubernetes and distributed infrastructure are not required to make a strong student portfolio project.
+## 5. Backend Feature Specification
+## 5.1 API foundations and cross-cutting concerns
+RESTful endpoint conventions, correct HTTP methods/status codes, resource naming, pagination and consistent response/error shapes.
+DTOs for requests/responses; do not expose EF Core entities directly as public API contracts.
+Dependency injection, configuration by environment, options validation and secure secret handling.
+Global exception handling using Problem Details or a consistent error contract; avoid leaking stack traces to clients.
+Request validation using FluentValidation or a consistent built-in validation strategy.
+Swagger/OpenAPI documentation with bearer/cookie authentication guidance and example error responses.
+CORS restricted to known frontend origins; HTTPS in deployed environments.
+API versioning only if needed; document a policy before introducing multiple versions.
+Rate limiting for login, password reset, coupon validation and order-creation endpoints.
+Health checks for application readiness and critical dependencies; do not expose sensitive diagnostics publicly.
+Structured logging, correlation/request IDs, audit events for privileged changes, and safe handling of personal data.
+Use asynchronous I/O for database and network operations; avoid blocking calls in request paths.
+## 5.2 Authentication and identity
+Customer registration, login, logout, email verification where feasible, forgot-password and reset-password flows.
+ASP.NET Core Identity for password hashing and account management; never store plain-text passwords.
+Short-lived access token/session strategy and carefully designed refresh-token rotation/revocation if JWT is used.
+Roles and policy-based authorization for Customer, Salesman and Admin; finer-grained policies for sensitive actions.
+Account activation/deactivation, failed-login protections and security-relevant audit events.
+Avoid storing long-lived refresh tokens in browser localStorage. Select a browser-appropriate session design, such as secure HttpOnly SameSite cookies or a backend-for-frontend approach, after considering CSRF and deployment architecture.
+Use secure password-reset tokens and never return secrets in API responses or logs.
+## 5.3 Product catalog and categories
+Category hierarchy using ParentCategoryId, with safeguards against cycles and invalid parent references.
+Product name, SKU, description, category, status, unit of measure, price and product media.
+Product variants when needed (for example, size/weight/package) rather than forcing every variation into one product row.
+Public product list with search, category filters, price range, sorting and pagination.
+Product detail endpoint and active/inactive product visibility rules.
+Admin create/update/archive operations, bulk price updates and image upload validation.
+Image storage abstraction, size/type limits, randomized file names and thumbnail/resize processing if practical.
+Use database indexes and SQL Server full-text search or indexed keyword search first. A separate search engine is optional, not mandatory.
+## 5.3.1 Admin Product Entry and Management
+Provide a protected admin product-management workflow so administrators can create, review, update, activate/deactivate and archive grocery products. The admin form must explicitly capture the product name, category, product image, price and relevant catalog details. Expiry information must be recorded against inventory batches, not only as one date on the product, because the same product can arrive in multiple batches with different expiry dates.
+Product form fields: product name, SKU/code, category, optional brand, description, unit of measure, selling price, optional cost price, active status, and applicable tax/discount settings.
+Category selection: choose an existing category from a searchable dropdown; allow category creation/editing only for users with the appropriate permission. Validate required fields and prevent duplicate SKUs.
+Product image: upload one primary image initially, with optional gallery images later. Validate file type and size on the server, generate a safe random filename, store the image through an image-storage abstraction, and save only the storage key/URL in SQL Server. Do not trust the file extension or execute uploaded content.
+Batch and expiry entry: when receiving stock, create a batch with batch/lot number, received date, expiry/best-before date when applicable, received quantity, remaining quantity and optional supplier/cost reference. A product can have multiple batches.
+Inventory validation: reject invalid quantities and dates, record stock receipt as a StockMovement, and retain an audit record of who created or changed product and batch information.
+Editing rules: changing a product's name, category, image or price must not rewrite historical order snapshots. Expiry dates and quantities are edited on the batch/stock-receiving workflow with appropriate permissions and audit logging.
+Admin list screen: search by name/SKU, filter by category and active status, show thumbnail, price, available stock, nearest eligible expiry and low-stock/expiry warning indicators. Use pagination.
+Suggested API operations: GET /api/admin/products, GET /api/admin/products/{id}, POST /api/admin/products, PUT/PATCH /api/admin/products/{id}, POST /api/admin/products/{id}/image, and POST /api/admin/products/{id}/batches. Keep route naming consistent with the final API convention.
+Acceptance checks: an authorized admin can add a product with name/category/image; the product appears in the storefront when active; stock receipt creates a batch and stock movement; invalid image/SKU/price/date/quantity is rejected; unauthorized users cannot access admin operations.
+## 5.4 Cart and guest cart
+Customer cart persisted by user identity and guest cart associated with a random, high-entropy guest token.
+Add, update and remove cart items; validate product status, unit, quantity and stock availability.
+Merge guest cart into the signed-in user's cart after login using a documented conflict policy.
+Treat guest tokens as bearer secrets: do not use sequential IDs; avoid logging them; rotate or invalidate them when appropriate.
+Recalculate prices and discounts on the server. Cart totals are indicative and must be recalculated during checkout.
+Do not rely on the browser cart as the source of truth for price or stock.
+## 5.5 Pricing, discounts and coupons
+Centralized pricing service used by cart preview, checkout, POS and order preview so calculations remain consistent.
+Money columns use an explicitly selected SQL decimal precision/scale (for example decimal(18,2) when the supported currency and business rules require two decimal places). Do not use floating-point types for money.
+Document the price order: line subtotal → eligible member discount → coupon → delivery fee/tax if applicable → final payable total.
+Decide and test whether coupons stack with member discounts. A simple initial rule is to prohibit stacking or apply the better eligible discount, with explicit maximum-discount rules.
+Coupon code uniqueness, validity dates, minimum order, usage limit, per-customer limit, active status and product/category eligibility if required.
+Apply coupon usage and order creation atomically enough to prevent simultaneous requests from exceeding limits.
+Store a price/discount/tax/shipping snapshot on the order so historical orders remain stable after product prices or rules change.
+## 5.6 Checkout and order lifecycle
+Guest checkout with name, phone, address and optional email; customer checkout using saved addresses.
+Order preview endpoint returning a server-calculated price breakdown without creating an order.
+Order creation with server-side recalculation of product prices, discounts, delivery fees and stock.
+Order and order-item snapshots including SKU/name/unit price/quantity/discount and relevant product details.
+Distinct order status and payment status. Example order flow: Pending → Confirmed → Packed → Out for Delivery → Delivered; cancellation/refund paths are explicit rather than arbitrary status edits.
+Customer order history and order detail with ownership checks.
+Guest order tracking using a high-entropy, unguessable tracking token or a combination of order reference and verified contact step. Do not expose private orders from a predictable order number alone.
+Cancellation rules based on current status; record who made the change and why.
+Invoice/receipt generation can be added after core order correctness is proven.
+## 5.7 Inventory, stock movements and concurrency
+Maintain on-hand quantity and, if checkout needs it, reserved quantity; define available stock clearly as on-hand minus reserved stock.
+Record every stock change in StockMovements with product/batch, signed quantity change, reason, reference entity, actor and timestamp.
+Support restock, sale, cancellation return, manual adjustment, damage/waste, expiry disposal and stocktake correction.
+Perform order stock changes within database transactions and use SQL Server concurrency controls, such as rowversion, conditional updates or suitable locking.
+Define how failed payment or cancelled orders release reserved stock. Avoid holding stock indefinitely.
+Restrict negative stock unless a deliberate business policy allows it; validate all changes on the server.
+Keep a clear audit trail for manual stock adjustments and require a reason.
+## 5.8 Food batches, expiry dates and alerts
+This is a core feature for a grocery/food store, not merely a product-level date field. A product can have multiple batches with different quantities, receiving dates, suppliers and expiry dates. Track inventory at batch level so a sale or disposal can be attributed to the correct batch.
+Product batch/lot records: product, batch number, received date, expiry/best-before date where applicable, received quantity, remaining quantity, cost if needed, supplier/reference and status.
+Expiry policy configurable by product/category: for example, alert at 30, 14, 7 and 1 day before expiry. These are example defaults, not universal food-safety rules.
+Low-stock threshold at product or inventory-location level, with ReorderLevel and current available quantity.
+Alert types: low stock, out of stock, approaching expiry, expired stock still on hand, and optionally high waste/near-expiry quantities.
+Admin dashboard widget with severity, affected product/batch, quantity, expiry date and suggested action.
+Scheduled background check that creates or updates alerts without creating duplicate alerts every run. Track alert status: Open, Acknowledged, Resolved, Dismissed.
+Optional email alerts through a configurable SMTP provider if available at no cost within the user's chosen service limits; the dashboard itself must work without email.
+Expiry handling: prevent expired batches from being sold where policy requires; ensure the checkout's stock allocation excludes expired or unavailable batches.
+Use FEFO (First Expired, First Out) allocation where appropriate: prefer eligible batches with the earliest expiry date. Keep the rule explicit and testable.
+Record expired/damaged goods as waste or disposal stock movements; never silently delete the quantity.
+Optional later feature: supplier and purchase-receiving records to make batch/expiry data easier to populate.
+Food safety note: date labels and rules differ by product and jurisdiction. The system should support configurable policies and human review rather than pretending that one global expiry rule is legally correct.
+## 5.9 Staff POS and in-store sales
+Staff creates a sale by searching/selecting products, entering quantities and confirming price totals.
+Support cash/Cash on Delivery and a generic recorded payment method first; online payment integration can be added separately.
+Record CreatedBy/SalesmanId, order channel (Online/POS), payment status and relevant receipt reference.
+Restrict discounts and void/refund actions by policy; log overrides and reasons.
+Use the same pricing, stock and order services as online checkout so the two channels cannot calculate different totals.
+Salesman reporting is scoped to permitted orders; administrators can view global reports.
+## 5.10 Users, audit, reports and notifications
+Admin can list users, activate/deactivate accounts and create staff accounts through protected workflows.
+Audit logs record sensitive changes such as price updates, stock adjustments, coupon changes, role changes and order-status overrides. Store meaningful before/after data while avoiding secrets.
+Reports: daily/weekly/monthly sales, order count, average order value, top-selling products, category sales, low stock, near-expiry stock, expired/wasted stock and sales by channel/staff.
+Define report semantics: gross sales, discounts, refunds, cancelled orders and net sales must be handled consistently.
+Use database aggregation and pagination; do not load all historical orders into memory to calculate a dashboard.
+Order confirmation and status notification through email/SMS can be optional adapters. The core system must not require a paid messaging API.
+Generate CSV exports first as a free, useful reporting feature; PDF invoices are a later enhancement.
+## 6. Suggested Database Design
+The following is a conceptual table list, not a final schema. Normalize core relationships, set foreign keys and unique constraints, define deletion behavior intentionally, and create indexes for actual query patterns. Use Identity's standard user/role tables instead of creating a separate password table.
+[TABLE]
+Table / entity | Key data and design notes
+Identity users and roles | Identity user ID, name/profile fields, normalized email, phone, active/lockout state and role relationships. Password hashes are managed by Identity.
+Categories | Id, Name, ParentCategoryId, ImageUrl, IsActive, sort order. Add uniqueness rules appropriate to category names/slugs.
+Products | Id, Name, SKU, Description, CategoryId, Unit, Price, IsActive, ReorderLevel, created/updated timestamps. SKU should be unique.
+ProductImages | ProductId, storage key/URL, sort order, alt text; allow multiple images per product.
+ProductVariants (optional) | ProductId, variant SKU, variant attributes, unit/packaging and variant-specific price/active state if the catalog needs variants.
+InventoryBatches | Id, ProductId, BatchNumber, ReceivedAt, ExpiryDate/BestBeforeDate, InitialQty, RemainingQty, SupplierId if supported, Status. Index ProductId + ExpiryDate.
+StockMovements | Id, ProductId, BatchId nullable only when allowed, QuantityChange, Reason, ReferenceType/Id, ActorUserId, CreatedAt, Notes. Append movement records rather than overwriting history.
+Carts | Id, UserId nullable, GuestTokenHash or secure token reference, CreatedAt, UpdatedAt, expiry/cleanup fields.
+CartItems | Id, CartId, ProductId or VariantId, Qty. Enforce one row per cart/item where appropriate.
+Coupons | Id, Code, DiscountType, Value, MinOrderAmount, MaxDiscount, StartDate, EndDate, UsageLimit, UsedCount or derived usage, IsActive and stacking policy.
+CouponRedemptions | CouponId, OrderId, CustomerId nullable, DiscountAmount, RedeemedAt. Supports per-customer limits and auditing.
+Orders | Id, OrderNo, UserId nullable, guest contact snapshot, shipping address snapshot, channel, subtotal, discount totals, delivery/tax totals if used, total, status, payment status, CreatedBy, CreatedAt.
+OrderItems | OrderId, ProductId nullable if product deletion is allowed, SKU/name/unit/price/discount snapshot, Qty and LineTotal. Historical details must survive catalog edits.
+OrderStatusHistory | OrderId, old/new status, actor, reason, timestamp. Supports traceable transitions.
+Addresses | UserId, label, recipient/contact, address lines, area/city/postcode and delivery notes; copy relevant values to the order at checkout.
+Payments | OrderId, provider/method, amount, currency, status, provider reference, idempotency/reference fields and timestamps. Never store raw card data or provider secrets.
+RefreshTokens / sessions | Only if required by the chosen authentication design; store hashes where appropriate, expiry, revocation and rotation/reuse detection data.
+AuditLogs | Actor, action, entity type/ID, timestamp, correlation ID and carefully selected before/after values.
+InventoryAlerts | Alert type, product/batch/location, threshold or expiry context, created/last-seen time, status, acknowledged/resolved by and timestamps.
+Suppliers / PurchaseReceipts (optional) | Supplier and stock receiving records to explain where batches came from and make expiry management practical.
+## Database integrity rules
+Use decimal columns for money; choose currency and scale deliberately.
+Use UTC timestamps in storage where appropriate and convert to local time in the UI/reporting layer.
+Use rowversion or another explicit concurrency strategy for inventory-sensitive records.
+Use foreign keys, check constraints, unique indexes and non-null rules to protect core invariants.
+Prefer inactive/archive states over deleting products or users that are referenced by historical orders.
+Keep order snapshots even when the current product name, price or address changes.
+Create indexes for SKU, active product/category browsing, order number, user/order history, status/date reports, batch expiry and alert status.
+Design stock movement and order changes so they can be audited and reconciled.
+## 7. API Module and Endpoint Plan
+Endpoint names below are illustrative. Choose a consistent route convention and response format before implementation. Protect every staff/customer route with server-side authorization.
+[TABLE]
+Module | Representative endpoints / operations
+Customer auth | POST /api/auth/register, /login, /refresh (if used), /logout, /forgot-password, /reset-password; profile endpoints.
+Staff auth | POST /api/admin/auth/login or a shared login with strict policy checks; staff user management remains admin-only.
+Categories | GET /api/categories; GET /api/categories/{id}; protected create/update/archive operations.
+Products | GET /api/products with search/category/price/sort/page filters; GET /api/products/{id}; protected CRUD, image upload, bulk price update.
+Cart | GET /api/cart; POST /api/cart/items; PUT /api/cart/items/{id}; DELETE /api/cart/items/{id}; POST /api/cart/merge.
+Coupons/pricing | POST /api/coupons/validate; POST /api/orders/preview; protected coupon CRUD and enable/disable.
+Checkout/orders | POST /api/orders; GET /api/orders/my; GET /api/orders/{id}; guest tracking endpoint using secure verification; protected order listing/status changes.
+Inventory | GET /api/admin/inventory; POST stock receipt/adjustment operations; GET low-stock and near-expiry batches; acknowledge/resolve alerts.
+Batches/expiry | Protected batch creation/receipt, batch detail, expiry report, expired stock disposition and waste movement operations.
+POS | Protected staff endpoint to create an in-store order using the same pricing/order/inventory services.
+Users | Admin-only list/create/deactivate staff and customer-management operations; avoid exposing sensitive identity fields.
+Reports | GET summary, sales by period, top products, sales by category/channel/staff, low-stock, near-expiry and expired/waste reports.
+System | Health/readiness endpoint with limited public details; secured diagnostics where necessary.
+## API conventions
+Use explicit request/response DTOs and consistent validation errors.
+Paginate every potentially large list; set maximum page size.
+Use appropriate status codes and distinguish validation, authentication, authorization, not-found and conflict responses.
+Consider idempotency keys for order/payment operations where duplicate submissions would be harmful.
+Use optimistic concurrency/ETag or rowversion-based conflict responses where appropriate.
+Never accept price, discount or stock totals from the browser as authoritative.
+## 8. Angular 22 Frontend Plan (Zoneless)
+## Suggested folders
+core — auth/session service, HTTP interceptors, app-wide error handling, route guards, configuration and shared singleton services.
+shared — reusable UI components, form controls, price display, pagination, confirmation dialogs, loading/empty/error states and pipes.
+features/storefront — home, category listing, product listing/detail and search.
+features/cart — cart page and mini-cart; guest cart lifecycle and post-login merge.
+features/checkout — address, delivery options, coupon, server-calculated summary, place order and confirmation.
+features/account — login, registration, profile, addresses and customer order history.
+features/admin — lazy-loaded dashboard, product list and Add/Edit Product form, category management, image upload/preview, batch receiving and expiry-date management, coupons, stock, alerts, orders, users, reports and POS.
+app.routes.ts — route configuration with lazy loading and role-aware navigation.
+## Frontend engineering guidance
+Use standalone components and lazy-loaded feature routes.
+Use Angular signals and services for local/shared state at first; introduce NgRx or another store only when state complexity justifies it.
+For zoneless Angular, follow Angular 22's supported zoneless setup and change-detection guidance. Prefer signals, async-aware templates and documented notification mechanisms over assumptions based on Zone.js.
+Use reactive forms or the current recommended Angular form approach consistently, with clear validation and accessible error messages.
+Use an HTTP interceptor for common headers and error handling. Avoid assuming that putting JWTs in localStorage is the safest browser session strategy.
+Route guards are a navigation aid, not backend security.
+Use Angular Material or PrimeNG if it helps build consistent admin tables and forms quickly; both are optional. Check each library's compatibility with the chosen Angular major version.
+Use a chart library only after report APIs are correct; charts must reflect clearly defined sales metrics.
+Support responsive layouts, keyboard navigation, visible focus, labels, loading states, empty states and useful error messages.
+## 9. Free / Student-Friendly Tooling and External Services
+The project should be usable without paying for external APIs. Core business logic should remain functional even when optional external services are not configured.
+[TABLE]
+Need | Free/local-first option | Cautions
+Backend development | .NET SDK, ASP.NET Core, EF Core | Open-source framework; check third-party package licenses.
+Frontend | Angular and TypeScript | Open-source; verify UI component library version compatibility and license.
+Database | SQL Server Developer for non-production development, or SQL Server Express if suitable | Developer edition is not for production. Express has resource limitations; check Microsoft's current terms.
+API testing | Swagger/OpenAPI UI and Postman free tier, or curl | Keep collections/environment files free of real secrets.
+Unit/integration tests | xUnit and ASP.NET Core test tooling | Free/open-source; database behavior still needs realistic integration testing.
+Browser tests | Playwright | Free/open-source; browser binaries require disk space.
+Version control/CI | Git and GitHub free tier | Free plan quotas and repository settings can change.
+Containers | Docker-compatible local container tooling | Check current licensing and OS requirements; containers are optional.
+Email in development | Local mail-capture tool such as Mailpit, or a console/logging adapter | Use a fake/local provider for development; do not send real customer data to test inboxes.
+Production email | Optional SMTP/provider with a verified free tier, or leave disabled initially | Free quotas and eligibility change; email must not block checkout.
+Product images | Local storage in development; a compatible object-storage free tier if available | Check storage, bandwidth, public-access and expiry limits. Do not commit uploads to Git.
+Payment development | Cash on Delivery and a payment-provider sandbox/test mode | Sandbox use is not a guarantee that live processing is free or available in every country.
+Bangladesh online payments | Add bKash/Nagad/SSLCOMMERZ only after verifying current merchant onboarding and test/sandbox availability | Live merchant processing commonly requires provider approval and may have transaction fees. Do not promise free live payments.
+Search | SQL Server indexed search / full-text search where suitable | A separate search cluster is optional and adds operational work.
+Monitoring | Structured console/file logs and health checks; optional open-source OpenTelemetry stack | Managed observability free tiers have limits. Avoid collecting secrets or unnecessary personal data.
+Hosting | Local demo, a free-tier host if currently available, or a low-cost deployment later | Free hosting and managed SQL offerings change frequently; a public production database may not be free.
+## External service policy
+No paid API is required to build or demonstrate the core application.
+Keep email, payment, image storage and messaging behind interfaces so they can be disabled or replaced.
+For the first demo, use Cash on Delivery and/or a payment sandbox. Clearly label simulated payments and never claim that a mock payment is a real transaction.
+Avoid dependence on Google Maps or another paid map API for delivery zones. Start with configurable city/area/zone data and delivery-fee rules in SQL Server.
+Do not integrate SMS until the project genuinely needs it; show order updates in the app and use local email capture for development.
+Verify current free-tier terms at the time of deployment; do not hard-code an assumption that a third-party service will remain free.
+## 10. Security and Reliability Checklist
+Enforce authorization at every protected API endpoint; test customer-to-customer data isolation.
+Validate every request on the server; normalize and constrain inputs.
+Use HTTPS in production and secure cookie/token settings appropriate to the chosen session design.
+Keep secrets in environment configuration or a secret store, never in source control or frontend bundles.
+Protect login, password reset, coupon validation, guest tracking and order creation against abuse.
+Use safe upload rules: allowlisted file types, size limits, randomized storage names and no execution of uploaded content.
+Prevent SQL injection by using EF Core parameterization and safe query construction.
+Use transactions and concurrency controls for inventory and coupon usage.
+Design payment webhooks for signature validation, idempotency and safe retries.
+Log security-relevant events without logging passwords, access tokens, refresh tokens, full payment data or unnecessary personal details.
+Use database backups and test restoration; backups are not useful until recovery has been tested.
+Track dependency updates and scan packages/secrets in CI.
+Use a consistent error contract; production errors must not expose stack traces, SQL details or secrets.
+Define data retention, account deactivation and audit log access rules.
+## 11. Testing Strategy
+[TABLE]
+Test level | What to test
+Unit tests | Price calculation, member discounts, coupon eligibility, stacking policy, order-status transitions, FEFO batch selection and alert thresholds.
+Integration tests | EF Core mappings/migrations, Identity, role/policy checks, order creation, transactions, stock updates, coupon usage and audit writes.
+API tests | Validation errors, HTTP status codes, pagination, sorting, authentication and ownership restrictions.
+Concurrency tests | Two buyers attempting to buy the final units; simultaneous coupon redemptions; duplicate order submissions.
+Frontend component tests | Cart state, form validation, loading/error/empty states, alert displays and role-aware navigation.
+End-to-end tests | Guest browse → cart → checkout → order confirmation; customer login → cart merge → order history; admin receives stock → batch alert appears; salesman creates POS order.
+Security tests | IDOR/ownership checks, privilege escalation, token/session handling, rate limits, upload validation and sensitive-data leakage.
+Operational tests | Health checks, log correlation, deployment configuration, database migration and backup restoration.
+Prioritize business-rule tests around price/coupon calculation and inventory/expiry handling. These areas can cause direct financial loss or unsafe stock handling if implemented incorrectly.
+## 12. Phased Roadmap — Small, Shippable Deliverables
+[TABLE]
+Phase | Work | Definition of done
+0. Plan and setup | Requirements, solution, Git repo, Angular app, API app, local SQL Server, configuration, CI baseline. | Angular can call a simple API endpoint; setup steps are documented; no secrets are committed.
+1. Catalog | Category hierarchy, products, seed data, public listing/detail, search/filter/sort/pagination. | A user can browse categories and product details end-to-end.
+2. Identity and permissions | Identity, registration/login, staff/admin policy, customer ownership rules and secure session design. | Automated tests prove guests, customers, staff and admins can only perform permitted actions.
+3. Cart | Guest and customer carts, quantity updates, stock checks, cart merge. | Guest cart survives refresh; login merge has documented duplicate-item behavior.
+4. Pricing and checkout | Central pricing service, member discount, coupon validation, order preview, guest/customer order creation. | Totals are calculated by the server and covered by unit tests.
+5. Inventory and food batches | Stock movements, receiving, batches, expiry dates, low-stock thresholds, scheduled alerts, FEFO rules. | Dashboard shows low stock/near-expiry/expired stock; stock changes are traceable.
+6. Admin catalog and coupons | Product/category CRUD, uploads, coupon management, stock adjustments and audit records. | Admin can manage the catalog; unauthorized roles are blocked by API tests.
+7. Orders and POS | Order listing, status transitions, staff-created in-store orders, receipts and sales attribution. | POS and online checkout use the same pricing/inventory rules.
+8. Dashboard and reports | Sales summary, period reports, top products, low-stock, expiry/waste and staff/channel reports. | Metrics have documented definitions and are verified against known test data.
+9. Polish and reliability | Notifications, CSV export, optional PDF invoice, accessibility, tests, rate limits, logging, backup plan. | Critical user journeys and failure scenarios are tested and documented.
+10. Deploy and present | Production-like configuration, HTTPS, database migration/backup, demo seed data, README, diagrams and walkthrough. | A reviewer can run the project from documentation and understand architecture, trade-offs and limitations.
+Keep each phase small. Finish one vertical slice across SQL Server, API and Angular before adding the next major capability. For example, deliver category listing from database through endpoint to Angular UI before building all admin features.
+## 13. Suggested Milestone Order for a Student
+First, finish a minimal but clean catalog API and Angular storefront. This creates a visible demo early.
+Then add identity and role policies, with automated authorization tests before staff features.
+Implement price calculation as a pure, well-tested service before checkout.
+Implement stock movements and batch expiry before adding sophisticated reporting.
+Use Cash on Delivery for the first real order workflow; add payment sandbox integration later.
+Add admin CRUD and POS using shared application services rather than duplicate business logic.
+Finish with test automation, deployment, architecture documentation and a polished demo.
+## 14. Portfolio and Job-Readiness Deliverables
+The project will be stronger in job applications if it shows not just a list of technologies but evidence that you understand why and how to use them.
+A clear README: project purpose, stack, prerequisites, setup, migrations, seed data, environment variables and test commands.
+Architecture diagram and a short explanation of Domain/Application/Infrastructure/API responsibilities.
+ER diagram showing Identity, products, categories, batches, stock movements, carts, orders, payments and alerts.
+OpenAPI documentation with example requests, validation failures and authorization requirements.
+A small automated test suite demonstrating pricing, coupons, concurrency and expiry rules.
+CI workflow that builds and tests the backend and builds/tests the frontend.
+A demo account strategy using fake data only; never commit real passwords or secrets.
+Screenshots or a short screen recording of storefront, cart, checkout, admin product creation (name/category/image), batch/expiry entry, POS, low-stock alerts and near-expiry alerts.
+A documented trade-off section: why modular monolith first, why SQL Server, why no paid APIs, and what would change at higher scale.
+A deployment guide and a limitations section that honestly distinguishes working features from mocked or future integrations.
+## 15. Scope Boundaries — What to Avoid Initially
+Do not start with microservices, Kubernetes, event sourcing or a distributed cache cluster. They increase complexity without proving the core business works.
+Do not add a separate search engine, Redis, message broker and multiple background job systems simultaneously.
+Do not implement real card storage or handle raw card details; use a reputable payment provider when payment integration is introduced.
+Do not treat a frontend guard, hidden button or secret URL as authorization.
+Do not trust client-supplied prices, discount amounts, order totals or stock counts.
+Do not use a single ExpiryDate on Products when multiple food batches can expire at different times.
+Do not let a recurring alert job create a new duplicate alert every time it runs.
+Do not claim the project is fully production-ready merely because it runs on a free host; document operational and service limits.
+## 16. Decisions to Lock Before Implementation
+[TABLE]
+Decision | Recommended starting choice
+Salesman order visibility | Own/assigned sales only by default; Admin sees all. Document whether POS sales can be transferred or reassigned.
+Discount stacking | Initially prohibit coupon + member discount stacking, or apply the better eligible discount. Make the rule explicit in tests.
+Stock allocation | Track batch quantities and use FEFO for eligible food batches where appropriate; define reservation timing for online checkout.
+Guest tracking | Use an unguessable tracking token or verified contact flow; never rely on sequential order numbers alone.
+Payment | Start with COD and clearly labeled sandbox/mock flows; integrate live provider only after merchant requirements and fees are confirmed.
+Delivery charge | Start with configurable city/area/zone rules in SQL Server, not a paid maps API.
+Notifications | Use in-app status and local email capture first; keep real email/SMS optional.
+Deployment | Make a local reproducible demo first; choose hosting only after checking current free-tier limits and SQL Server compatibility.
+Currency and tax | Define supported currency, rounding, tax and delivery-fee rules before finalizing decimal precision and price calculations.
+Expiry policy | Make thresholds configurable by product/category; distinguish best-before and use-by/expiry semantics where the business needs them.
+## 17. Official Documentation to Use
+Use official documentation as the source of truth for version-specific behavior and deployment requirements. Verify current release compatibility when you start implementation.
+ASP.NET Core: https://learn.microsoft.com/aspnet/core/
+.NET releases and support: https://dotnet.microsoft.com/en-us/platform/support/policy/dotnet-core
+Entity Framework Core: https://learn.microsoft.com/ef/core/
+ASP.NET Core Identity: https://learn.microsoft.com/aspnet/core/security/authentication/identity
+Angular documentation: https://angular.dev/
+Angular zoneless guide: https://angular.dev/guide/zoneless
+SQL Server documentation: https://learn.microsoft.com/sql/sql-server/
+xUnit: https://xunit.net/
+Playwright: https://playwright.dev/
+GitHub Actions: https://docs.github.com/actions
+## Final Recommendation
+Build Smart-Haat as a modular monolith using .NET 10, Angular 22 zoneless and SQL Server. Reuse sound backend fundamentals from the Trevoir Williams course, but adapt them to commerce-specific requirements such as pricing, inventory concurrency, batch expiry, auditability and secure role-based access.
+Keep Smart-Haat free to develop and demonstrate: local SQL Server, open-source tooling, Cash on Delivery, local email capture, and optional sandbox integrations. Make external services replaceable and document any deployment free-tier limits.
